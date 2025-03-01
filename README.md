@@ -29,12 +29,12 @@ In monthly version, simply select start week and fill in weekly hours and short 
 - Based on weeks, works over month borders
 - Lunch break deduction
 - summary field
+- weekly logging for whole month added
 
 ## To-Do list
 
 for functions, most likely trying to add following:
 - Combining weekly and monthly datas
-- weekly logging for whole month
 - Database functionality?
 - with databases..: login, and logout pages
 - security measures (if anything private is handled)
