@@ -16,7 +16,7 @@ In monthly version, simply select start week and fill in weekly hours and short 
 4. Select "From text/CSV"
 5. Locate your file, most likely in dowloads folder...
 6. Select "import"
-7. Click "load", the default settings work and are okay.
+7. Click "load", check settings and select a correct separator using the preview table feaure in Excel.
 8. Wo-hoo! Your hours have beem logged into excel-file and you may save the excel file for later use.
 
 ## Functions
@@ -28,8 +28,14 @@ In monthly version, simply select start week and fill in weekly hours and short 
 - monthly logging by the week
 - Based on weeks, works over month borders
 - Lunch break deduction
+- lunch break length option
+- file name field
 - summary field
 - weekly logging for whole month added
+- total weekly hours
+- total overall weekly hours for all weeks
+- project partner logos
+- separator change made in code, marked clearly for further changes. currently "£"
 
 ## To-Do list
 
@@ -38,6 +44,4 @@ for functions, most likely trying to add following:
 - Database functionality?
 - with databases..: login, and logout pages
 - security measures (if anything private is handled)
-- File name field
-- Lunch break lenght option
-- Currently uses "," as delimiter so using it in summary or elsewhere breaks the system. Changing delimiter is simple enough though
+
