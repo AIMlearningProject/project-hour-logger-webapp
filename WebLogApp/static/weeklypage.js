@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('setWeekBtn').addEventListener('click', prePopulateDates);
     document.getElementById("addWeekBtn").addEventListener('click', addWeekToForm);
     document.getElementById("deleteWeekBtn").addEventListener('click', deleteWeekFromForm)
-
+    document.getElementById('saveBtn').addEventListener('click', saveWeeklyData);
 
     // Pre-load the first dynamic week
     addWeekToForm();
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateWeekCounter();
 });
 
-// Rudimentary "session" handling
+// Fix session handling, form data saving 
 function saveFormData() {
     const form = document.getElementById('reportForm');
     const formData = new FormData(form);
@@ -80,6 +80,7 @@ function updateWeekCounter() {
 // Initial week is there
 let weekCount = 1;
 
+// Function to add a week to the form
 function addWeekToForm() {
     if (weekCount < 4) {
         weekCount++; // Increment here for the week count with unique ID
@@ -176,7 +177,7 @@ function addWeekToForm() {
     }
 }
 
-
+// Function to get the Monday of a given week number and year
 function getMondayOfWeek(weekNumber, year) {
     const firstDayOfYear = new Date(year, 0, 1);
     const daysOffset = (weekNumber - 1) * 7;
@@ -185,6 +186,7 @@ function getMondayOfWeek(weekNumber, year) {
     return monday;
 }
 
+// Pre-populate dates based on week number and year
 function prePopulateDates() {
     const weekNumber = parseInt(document.getElementById('weekNumber').value);
     const year = parseInt(document.getElementById('year').value);
@@ -268,6 +270,58 @@ function totalHoursAllWeeks() {
     return overallTotalHours.toFixed(2);
 }
 
+// Function to save weekly data to the database
+async function saveWeeklyData() {
+    const form = document.getElementById('reportForm');
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    // Validate time fields
+    for (let week = 1; week <= weekCount; week++) {
+        ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach((day) => {
+            const timeStarted = data[`timeStarted${day}${week}`];
+            const timeEnded = data[`timeEnded${day}${week}`];
+
+            if (timeStarted && !/^\d{2}:\d{2}$/.test(timeStarted)) {
+                alert(`Invalid time format for ${day} ${week}. Please use HH:MM.`);
+                return;
+            }
+            if (timeEnded && !/^\d{2}:\d{2}$/.test(timeEnded)) {
+                alert(`Invalid time format for ${day} ${week}. Please use HH:MM.`);
+                return;
+            }
+
+            // Calculate hours worked
+            const lunchBreak = data[`lunchBreak${day}${week}`] === 'on' ? 'Yes' : 'No';
+            const hoursWorked = calculateHours(timeStarted, timeEnded, lunchBreak);
+            data[`hoursWorked${day}${week}`] = hoursWorked || 0;
+        });
+    }
+
+    try {
+        const response = await fetch('/save-weekly-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            window.location.href = '/confirmation-weekly'; // Redirect to confirmation page
+        } else {
+            alert('Failed to save weekly data.');
+        }
+    } catch (error) {
+        console.error('Error saving weekly data:', error);
+        alert('An error occurred while saving weekly data.');
+    }
+}
+
+// Function to generate CSV from form data
 function generateCSV() {
     const csvData = [];
     let totalCSVHours = 0;
@@ -283,7 +337,7 @@ function generateCSV() {
                 const date = dateField.value;
                 const timeStarted = document.querySelector(`[name="timeStarted${day}${week}"]`).value;
                 const timeEnded = document.querySelector(`[name="timeEnded${day}${week}"]`).value;
-                const lunchBreak = document.querySelector(`[name="lunchBreak${day}${week}"]`).checked ? 'Yes' : 'No';
+                const lunchBreak = document.querySelector(`[name="lunchBreak${day}${week}"]`).checked ? 'On' : null;
                 const summary = document.querySelector(`[name="summary${day}${week}"]`).value;
                 const projectCode = document.querySelector(`[name="projectCode${day}${week}"]`).value;
 
@@ -292,7 +346,7 @@ function generateCSV() {
                     totalCSVHours += parseFloat(hoursWorked);
                     weekTotal += parseFloat(hoursWorked);
                 }
-                csvData.push([day, date, timeStarted, timeEnded, lunchBreak, summary, projectCode, hoursWorked].join(','));  // change the separator in join('')
+                csvData.push([day, date, timeStarted, timeEnded, lunchBreak, summary, projectCode, hoursWorked].join('£'));  // change the separator in join('')
             } else {
                 console.error(`Element with name date${day}${week} not found`);
             }
@@ -315,5 +369,3 @@ function generateCSV() {
     link.click();
     document.body.removeChild(link);
 }
-
-

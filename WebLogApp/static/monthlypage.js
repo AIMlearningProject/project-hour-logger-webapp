@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('downloadBtn').addEventListener('click', generateCSV);
     document.getElementById('setMonthBtn').addEventListener('click', prePopulateWeeks);
-
+    document.getElementById('saveBtn').addEventListener('click', saveMonthlyData);
     loadFormData();
 
     // Save form data to local storage on input change
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('input', saveFormData);
 });
 
+// Fix session handling, form data saving 
 function saveFormData() {
     const form = document.getElementById('reportForm');
     const formData = new FormData(form);
@@ -19,6 +20,7 @@ function saveFormData() {
     localStorage.setItem('formData', JSON.stringify(data));
 }
 
+// Load form data from local storage
 function loadFormData() {
     const formData = JSON.parse(localStorage.getItem('formData') || '{}');
     for (const key in formData) {
@@ -31,6 +33,7 @@ function loadFormData() {
     }
 }
 
+// Get week number of the year based on date
 function getWeekNumber(date) {
     const firstJanuary = new Date(date.getFullYear(), 0, 1);
     const days = Math.floor((date - firstJanuary) / (24 * 60 * 60 * 1000));
@@ -38,6 +41,7 @@ function getWeekNumber(date) {
     return weekNumber;
 }
 
+// Pre-populate week fields based on month and year
 function prePopulateWeeks() {
     const month = parseInt(document.getElementById('month').value);
     const year = parseInt(document.getElementById('year').value);
@@ -59,6 +63,45 @@ function prePopulateWeeks() {
     saveFormData(); // Save the pre-populated weeks to local storage
 }
 
+// Function to save weekly data to the database
+async function saveMonthlyData() {
+    const form = document.getElementById('reportForm');
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    // Calculate total hours
+    const weeks = ['1', '2', '3', '4'];
+    let totalHours = 0;
+    weeks.forEach(week => {
+        const weeklyHours = parseFloat(data[`weeklyHours${week}`]) || 0;
+        totalHours += weeklyHours;
+    });
+    data.totalHours = totalHours.toFixed(2); // Add total hours to the data object
+
+    try {
+        const response = await fetch('/save-monthly-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            window.location.href = '/confirmation-monthly'; // Redirect to confirmation page
+        } else {
+            alert('Failed to save monthly data.');
+        }
+    } catch (error) {
+        console.error('Error saving monthly data:', error);
+        alert('An error occurred while saving monthly data.');
+    }
+}
+
+// Generate CSV file from form data
 function generateCSV() {
     const form = document.getElementById('reportForm');
     const requiredFields = form.querySelectorAll('[required]');
@@ -100,8 +143,9 @@ function generateCSV() {
     const csvContent = csvData.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
+    const fileName = document.getElementById('filename').value || 'monthly_report_from_LogTool';
     link.href = URL.createObjectURL(blob);
-    link.download = 'monthly_report.csv'; // Name of the file
+    link.download = `${fileName}.csv`; // Name of the file
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
