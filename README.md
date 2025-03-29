@@ -16,8 +16,16 @@ In monthly version, simply select start week and fill in weekly hours and short 
 4. Select "From text/CSV"
 5. Locate your file, most likely in dowloads folder...
 6. Select "import"
-7. Click "load", check settings and select a correct separator using the preview table feaure in Excel.
-8. Wo-hoo! Your hours have beem logged into excel-file and you may save the excel file for later use.
+7. Select "custom" in separator, find the separator used in the preview window, should be just random character inbetween words.
+8. Click "load" and your data will be shown in Excel sheet.
+9. Wo-hoo! Your hours have beem logged into excel-file and you may save the excel file for later use.'
+
+or.
+
+1. Fill the form as per.
+2. Click on save button.
+3. Server redirects you to confirmation page where you can navigate back or sign out.
+4. If instead error message pops up, fix the error and try to save again.
 
 ## Functions
 
@@ -36,12 +44,16 @@ In monthly version, simply select start week and fill in weekly hours and short 
 - total overall weekly hours for all weeks
 - project partner logos
 - separator change made in code, marked clearly for further changes. currently "£"
+- database system functional
+- login works
+- sign out works
+- weekly logs save works
+- monthly logs save works
+- 
 
 ## To-Do list
 
-for functions, most likely trying to add following:
+add or improve the following:
 - Combining weekly and monthly datas
-- Database functionality?
-- with databases..: login, and logout pages
-- security measures (if anything private is handled)
+- security measures
 
