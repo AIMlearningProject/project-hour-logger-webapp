@@ -1,59 +1,104 @@
-# project-hour-logger-webapp
-Webapp for logging in hours with a short summary. Calculates hours and outputs a CSV-file.
+# WebLogApp
 
+WebLogApp is a logging tool designed to help users track their weekly and monthly work hours. It provides a user-friendly interface for logging work details, generating reports, and saving data to a database.
 
-## Project read-me work in progress.
+## Features
 
-## How to use the app
+- **User Authentication**: Secure login and registration system with hashed passwords.
+- **Weekly Logging**: Log daily work hours, summaries, and project codes for up to 4 weeks. Includes ability to change the lunchbreak length and on which days break has been taken.
+- **Monthly Logging**: Summarize weekly logs into monthly reports.
+- **Dynamic Forms**: System adds or removes weekly forms dynamically. No hard coded forms!
+- **CSV Export**: Generate CSV reports for weekly and monthly logs for local handling.
+- **Data Persistence**: Save logs to a PostgreSQL database.
+- **Responsive Design**: User-friendly interface with a modern design.
+- **Easy changes to CSV separator in code**: Changes to separator in CSV-format is easily changed.
 
-Select start date to automatically populate the date fields, fill in start time and end time for each day of week. Click on lunch breack if you had one. Write a short summary of your work on the days you have worked. Lastly add the project code into its own field.
-In monthly version, simply select start week and fill in weekly hours and short summary. In both cases, download the CSV and follow the steps below.
+## Technologies Used
 
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Deno.js
+- **Database**: PostgreSQL
+- **Libraries**:
+  - [bcrypt](https://deno.land/x/bcrypt) for password hashing
+  - [zod](https://deno.land/x/zod) for input validation
 
-1. Dowload the CSV-file. 
-2. Open Excel
-3. Navigate to "Data" in Excel
-4. Select "From text/CSV"
-5. Locate your file, most likely in dowloads folder...
-6. Select "import"
-7. Select "custom" in separator, find the separator used in the preview window, should be just random character inbetween words.
-8. Click "load" and your data will be shown in Excel sheet.
-9. Wo-hoo! Your hours have beem logged into excel-file and you may save the excel file for later use.'
+## Installation
 
-or.
+- Clone the repository: git clone https://github.com/your-repo/WebLogApp.git | cd WebLogApp .
+- Install PostgreSQL and check that it has been installed properly.
+- Create a database named "logtool-db".
+- Set up the database with SQL script: psql -U postgres -d logtool-db -f db/system_structure.sql .
+- Configure the database connection in code at db/db.js with your own credentials!!!
+- Run the application with: deno run --allow-net --allow-env --allow-read --watch app.js .
 
-1. Fill the form as per.
-2. Click on save button.
-3. Server redirects you to confirmation page where you can navigate back or sign out.
-4. If instead error message pops up, fix the error and try to save again.
+## Usage
 
-## Functions
+- Use of the application requires account creation and login.
+- Creating account is very easy with any email and any password.
+- Recommended to NOT use any actual email you may actually use. System only checks if the field has been filled with an email.
 
-- Rudimentary session handling
-- Automatic field population
-- Automatic hour calculation and conversion
-- 5-days of logging, and
-- monthly logging by the week
-- Based on weeks, works over month borders
-- Lunch break deduction
-- lunch break length option
-- file name field
-- summary field
-- weekly logging for whole month added
-- total weekly hours
-- total overall weekly hours for all weeks
-- project partner logos
-- separator change made in code, marked clearly for further changes. currently "£"
-- database system functional
-- login works
-- sign out works
-- weekly logs save works
-- monthly logs save works
-- 
+### Weekly Logging
 
-## To-Do list
+- Navigate to the **Weekly Logging Tool**.
+- Enter the week number and year, then click "Set Week".
+- Select lunch break length
+- Fill in the daily work details (time started, time ended, lunch break, summary, project code).
+- Add or remove weeks as needed using the "Add Week" and "Delete Week" buttons.
+- Save the log or download it as a CSV file.
 
-add or improve the following:
-- Combining weekly and monthly datas
-- security measures
+### Monthly Logging
 
+- Navigate to the **Monthly Logging Tool**.
+- Enter the month and year, then click "Set Month".
+- Fill in the weekly hours, project codes, and summaries for each week.
+- Save the log or download it as a CSV file.
+
+## Database Schema for development purposes
+
+### `zephyr_users`
+- `user_id`: Primary key
+- `username`: User's email (unique)
+- `password_hash`: Hashed password
+- `user_token`: UUID for pseudonymization
+- `role`: User role (default: `user`)
+
+### `zephyr_weekly_logs`
+- `log_id`: Primary key
+- `user_token`: Foreign key referencing `zephyr_users`
+- `week_number`: Week number
+- `year`: Year
+- `day`: Day of the week
+- `date`: Date
+- `time_started`: Start time
+- `time_ended`: End time
+- `lunch_break`: Boolean indicating if a lunch break was taken
+- `summary`: Work summary
+- `project_code`: Project code
+- `hours_worked`: Total hours worked
+
+### `zephyr_monthly_logs`
+- `log_id`: Primary key
+- `user_token`: Foreign key referencing `zephyr_users`
+- `month`: Month
+- `year`: Year
+- `total_hours`: Total hours worked in the month
+
+### `zephyr_admin_logs`
+- `log_id`: Primary key
+- `admin_id`: Foreign key referencing `zephyr_users`
+- `action`: Admin action description
+- `resource_id`: ID of the affected resource
+- `timestamp`: Timestamp of the action
+
+## Security Features
+
+- **Password Hashing**: User passwords are hashed using bcrypt.
+- **Session Management**: Secure session handling with UUIDs and cookies.
+- **Pseudonymization**: User data is pseudonymized using UUIDs.
+
+## Deno and PostgreSQL links and help
+
+- [Deno](https://deno.land/) for the runtime environment.
+- [PostgreSQL](https://www.postgresql.org/) for the database.
+- [bcrypt](https://deno.land/x/bcrypt) for password hashing.
+- [zod](https://deno.land/x/zod) for input validation.
