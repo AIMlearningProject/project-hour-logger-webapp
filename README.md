@@ -1,3 +1,5 @@
+This project is part of the AIMlearning project, which is co-funded by the European Union. The project will run from 1.2.2024 to 30.4.2027.
+
 # WebLogApp
 
 WebLogApp is a logging tool designed to help users track their weekly and monthly work hours. It provides a user-friendly interface for logging work details, generating reports, and saving data to a database.
@@ -101,4 +103,5 @@ WebLogApp is a logging tool designed to help users track their weekly and monthl
 - [Deno](https://deno.land/) for the runtime environment.
 - [PostgreSQL](https://www.postgresql.org/) for the database.
 - [bcrypt](https://deno.land/x/bcrypt) for password hashing.
+
 - [zod](https://deno.land/x/zod) for input validation.
